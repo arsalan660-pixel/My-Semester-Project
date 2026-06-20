@@ -14,7 +14,7 @@ def add_product(title, price, description, seller,image,category):
 
     cursor.execute("""
     INSERT INTO products (title, price, description, seller,image,category)
-    VALUES (?, ?, ?, ?,?)
+    VALUES (?, ?, ?, ?,?,?)
     """, (title, price, description, seller,image,category))
 
     conn.commit()
