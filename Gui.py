@@ -8,6 +8,9 @@ from PIL import Image, ImageTk
 from auth import register_user, login_user, delete_user
 from product import add_product, get_products,delete_product,mark_as_sold
 import os
+from collections import deque
+recently_viewed={}
+
 
 current_user = None
 
@@ -76,6 +79,11 @@ def logout():
         "Logout",
         "Logged out successfully"
     )
+
+def track_view(product,user) :
+    if user[2] not in recently_viewed :
+        recently_viewed[user[2]]=deque(maxlen=5)
+    recently_viewed[user[2]].append(product)
 
 
 # =========================
@@ -565,6 +573,8 @@ def open_products_window():
     )
 
     search_btn.pack(side=LEFT)
+    recent_btn=Button(search_frame,text="Recently Viewed",bg="#245de6",fg="white",font=("Helvetica",11,"bold"),relief="flat",cursor="hand2",padx=12,pady=8,command=lambda: open_recently_viewed())
+    recent_btn.pack(side=LEFT,padx=10)
 
     # =========================
     # SCROLLABLE AREA
@@ -677,6 +687,8 @@ def open_products_window():
             )
 
             card.grid_propagate(False)
+            if current_user :
+                card.bind("<Button-1>" , lambda e , p=product :track_view(p,current_user))
 
             # =========================
             # IMAGE SECTION
@@ -694,6 +706,8 @@ def open_products_window():
             )
 
             image_frame.pack_propagate(False)
+            if current_user :
+                image_frame.bind("<Button-1>" , lambda e , p=product :track_view(p,current_user))
 
             try:
 
@@ -873,6 +887,26 @@ def open_products_window():
 
                 row += 1
 
+
+    def open_recently_viewed() :
+        if not current_user :
+            messagebox.showerror("Login Required !", "please Login First")
+            return
+        email=current_user[2]
+        viewed=recently_viewed.get(email,[])
+        if not viewed :
+            messagebox.showinfo("Recently Viewed","You Have not Viewed Any Product Yet")
+            return
+        rv_window=Toplevel(window)
+        rv_window.title("Recently Viewed Products")
+        rv_window.geometry("650x550")
+        rv_window.configure(bg="#dff6f0")
+        Label(rv_window,text="Recently Window Products",font=("Helvetica",11,"bold"),bg="#dff6f0",fg="#002f34").pack(pady=15)
+        for product in reversed(viewed) :
+            tittle=product[1]
+            price=product[2]
+            Label(rv_window,text=f"{tittle} - Rs. {price}",font=("Helvetica",12),bg="white",fg="#002f34",anchor="w").pack(fill="x",padx=20,pady=5)
+
     # SEARCH FUNCTION
 
     def search_products():
@@ -961,14 +995,13 @@ def open_register():
 
             return
 
-        register_user(name, email, password)
+        result=register_user(name, email, password)
 
-        messagebox.showinfo(
-            "Success",
-            "User Registered Successfully"
-        )
-
-        register_window.destroy()
+        if result :
+            messagebox.showinfo("Success","Succesfully registered !!")
+            register_window.destroy()
+        else :
+            messagebox.showerror("Error","Email already exists !! ")
 
     register_btn = Label(
         register_window,
