@@ -6,18 +6,23 @@ A desktop-based OLX Clone developed using **Python**, **Tkinter**, and **SQLite*
 
 * User Registration
 * User Login
+* Remember Login User
 * Delete Account
 * Sell Products
 * Upload Product Images
 * View Products
 * Search Products
 * Category Filter
+* Features List
 * Buy Products
+* Recent Viewed Products
+* Delete Product
+* Undo Delete Product
 * Sold Out Status
 * Modern Tkinter GUI
 * SQLite Database Integration
 
-## Technologies Used
+
 
 ## Technologies Used
 
