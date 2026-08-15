@@ -19,6 +19,8 @@ A desktop-based OLX Clone developed using **Python**, **Tkinter**, and **SQLite*
 
 ## Technologies Used
 
+## Technologies Used
+
 * Python 3.14
 * Tkinter
 * SQLite3
