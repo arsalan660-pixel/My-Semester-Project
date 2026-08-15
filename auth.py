@@ -62,3 +62,4 @@ def delete_user(email, password):
     conn.close()
 
     return deleted
+

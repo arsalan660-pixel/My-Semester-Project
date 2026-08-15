@@ -4,6 +4,7 @@ __pycache__/
 
 # Local database
 database/olx.db
+database/saved_user.txt
 
 # OS files
 .DS_Store

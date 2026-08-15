@@ -1,3 +1,4 @@
+from itertools import product
 import sqlite3
 
 # Database connection
@@ -36,6 +37,16 @@ def get_products():
     conn.close()
 
     return products
+
+def restore_products(product_id,title,price,description,seller,image,status,category) :
+    conn=connect()
+    cursor=conn.cursor()
+    cursor.execute("""
+     INSERT INTO products (id,title,price,description,seller,image,status,category)
+    VALUES(?,?,?,?,?,?,?,?) 
+    """,(product_id,title,price,description,seller,image,status,category))
+    conn.commit()
+    conn.close()
 
 def delete_product(product_id):
 
