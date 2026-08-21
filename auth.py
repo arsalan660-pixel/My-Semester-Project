@@ -51,9 +51,20 @@ def delete_user(email, password):
     cursor = conn.cursor()
 
     cursor.execute(
-        "DELETE FROM users WHERE email = ? AND password = ?",
-        (email, password)
-    )
+        "SELECT * FROM users WHERE email = ?",(email,))
+    user=cursor.fetchone()
+    if user is None :
+        conn.close()
+        return False
+    stored_hash=user[3]
+    password_matches=bcrypt.checkpw(password.encode(),stored_hash.encode())
+
+    if not password_matches :
+        conn.close()
+        return False
+    cursor.execute("DELETE FROM users WHERE email=?",(email,))
+
+
 
     conn.commit()
 
