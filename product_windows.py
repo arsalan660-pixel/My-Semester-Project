@@ -10,7 +10,7 @@ def open_add_product(window, user):
 
     add_window = Toplevel(window)
     add_window.title("Sell Product")
-    add_window.geometry("500x900")
+    add_window.geometry("500x750")
     add_window.configure(bg="#dff6f0")
     add_window.grab_set()
 
@@ -38,7 +38,7 @@ def open_add_product(window, user):
     Label(add_window, text="Sub-Category", font=("Helvetica", 12, "bold"), bg="#dff6f0").pack(pady=(0, 5))
     subcategory_menu = OptionMenu(add_window, subcategory_var, "")
     subcategory_menu.config(width=20, font=("helvetica", 11))
-    subcategory_menu.pack(pady=(5, 20))
+    subcategory_menu.pack(pady=(5, 10))
 
     def update_subcategories(*args):
         subs = get_subcategories(category_var.get())
@@ -54,7 +54,7 @@ def open_add_product(window, user):
 
     Label(add_window,text="Description",font=("Helvetica", 12, "bold"),bg="#dff6f0").pack(pady=(0,5))
     desc_text = Text(add_window,width=35,height=6,font=("Helvetica", 11))
-    desc_text.pack(pady=(5,20))
+    desc_text.pack(pady=(5,10))
 
     image_path = StringVar()
 
@@ -62,7 +62,7 @@ def open_add_product(window, user):
         file = filedialog.askopenfilename(
             parent=add_window,
             title="Select Product Image",
-            filetypes=[("PNG Files", "*.png"),("JPG Files", "*.jpg"),("JPEG Files", "*.jpeg")]
+            filetypes=[("PNG Files", "*.png"),("JPG Files", "*.jpg"),("JPEG Files", "*.jpeg"),("WEB P FILES","*.webp")]
         )
         if file:
             image_path.set(file)
@@ -73,7 +73,7 @@ def open_add_product(window, user):
     upload_btn.bind("<Button-1>",lambda e: upload_image())
 
     image_label = Label(add_window,text="No Image Selected",font=("Helvetica", 10),bg="#dff6f0",fg="gray")
-    image_label.pack(pady=(0,20))
+    image_label.pack(pady=(0,5))
 
     def save_product():
         title = title_entry.get()
@@ -97,7 +97,7 @@ def open_add_product(window, user):
         add_window.destroy()
 
     save_btn = Label(add_window,text="💰 Sell Product",bg="#00a49f",fg="white",font=("Helvetica", 13, "bold"),width=22,height=2,cursor="hand2")
-    save_btn.pack(pady=(20,10))
+    save_btn.pack(pady=(10,5))
     save_btn.bind("<Button-1>",lambda e: save_product())
 
 
