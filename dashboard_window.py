@@ -53,7 +53,14 @@ def open_dashboard(window, user):
     my_products = [p for p in all_products if p.seller == user[1]]
     active_count = len([p for p in my_products if p.status != "sold"])
     sold_count = len([p for p in my_products if p.status == "sold"])
-    total_value = sum(float(p.price) for p in my_products)
+    
+    # Safe calculation taake app crash na ho
+    total_value = 0
+    for p in my_products:
+        try:
+            total_value += float(p.price)
+        except ValueError:
+            pass
 
     stats_frame = Frame(dashboard, bg="#dff6f0")
     stats_frame.pack(fill="x", padx=25, pady=(0, 20))
@@ -107,9 +114,17 @@ def open_my_listings(window, user):
 
     Label(listings_window, text="My Listings", font=("Helvetica", 24, "bold"), bg="#dff6f0", fg="#002f34").pack(pady=20)
 
-    canvas = Canvas(listings_window, bg="#dff6f0", highlightthickness=0)
-    scrollbar = Scrollbar(listings_window, orient="vertical", command=canvas.yview)
-    scrollable_frame = Frame(canvas, bg="#dff6f0")
+    # Main Card Wrapper for the whole list
+    card = Frame(listings_window, bg="white", highlightthickness=1, highlightbackground="#e0e0e0", bd=0)
+    card.pack(padx=30, pady=(0, 30), fill="both", expand=True)
+
+    inner = Frame(card, bg="white")
+    inner.pack(padx=15, pady=15, fill="both", expand=True)
+
+    # Canvas and Scrollbar set to white background to match inner frame
+    canvas = Canvas(inner, bg="white", highlightthickness=0)
+    scrollbar = Scrollbar(inner, orient="vertical", command=canvas.yview)
+    scrollable_frame = Frame(canvas, bg="white")
 
     scrollable_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
     canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
@@ -127,14 +142,16 @@ def open_my_listings(window, user):
         price = product.price
         status = product.status
 
-        card = Frame(scrollable_frame, bg="white", width=280, height=200, highlightbackground="#e0e0e0", highlightthickness=1)
-        card.grid(row=row, column=col, padx=15, pady=15)
-        card.grid_propagate(False)
+        # Individual item card (slightly distinct from white background)
+        item_card = Frame(scrollable_frame, bg="#f8f9fa", width=250, height=180, highlightbackground="#e0e0e0", highlightthickness=1)
+        item_card.grid(row=row, column=col, padx=12, pady=12)
+        item_card.grid_propagate(False)
 
-        Label(card, text=title, font=("Helvetica", 14, "bold"), bg="white", fg="#002f34").pack(anchor="w", padx=15, pady=(15, 5))
-        Label(card, text=f"Rs. {price}", font=("Helvetica", 12, "bold"), bg="white", fg="#002f34").pack(anchor="w", padx=15)
-        status_color = "#e63939" if status == "sold" else "#00a49f"
-        Label(card, text=status.upper(), font=("Helvetica", 10, "bold"), bg="white", fg=status_color).pack(anchor="w", padx=15, pady=10)
+        Label(item_card, text=title, font=("Helvetica", 14, "bold"), bg="#f8f9fa", fg="#002f34").pack(anchor="w", padx=15, pady=(15, 5))
+        Label(item_card, text=f"Rs. {price}", font=("Helvetica", 12, "bold"), bg="#f8f9fa", fg="#002f34").pack(anchor="w", padx=15)
+        
+        status_color = "#ff4d4d" if status == "sold" else "#00a49f"
+        Label(item_card, text=status.upper(), font=("Helvetica", 10, "bold"), bg="#f8f9fa", fg=status_color).pack(anchor="w", padx=15, pady=10)
 
         col += 1
         if col == 3:

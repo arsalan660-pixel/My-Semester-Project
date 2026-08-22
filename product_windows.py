@@ -4,6 +4,47 @@ from PIL import Image, ImageTk
 import state
 from product import add_product, get_products, delete_product, mark_as_sold
 from category_helpers import category_tree, get_subcategories
+def create_product_card(parent, product, click_callback):
+    """Ek product card banata hai aur return karta hai."""
+    card = Frame(parent, bg="white", width=300, height=380, highlightthickness=1, highlightbackground="#e0e0e0", bd=0, cursor="hand2")
+    card.grid_propagate(False)
+    
+    # Click events
+    card.bind("<Button-1>", click_callback)
+
+    image_frame = Frame(card, bg="#f8f8f8", width=280, height=200)
+    image_frame.pack(pady=15)
+    image_frame.pack_propagate(False)
+    image_frame.bind("<Button-1>", click_callback)
+
+    try:
+        if product.image:
+            img = Image.open(product.image)
+            img = img.resize((280, 200), Image.LANCZOS)
+            img = ImageTk.PhotoImage(img)
+            image_label = Label(image_frame, image=img, bg="#f5f5f5")
+            image_label.image = img
+            image_label.pack(fill="both", expand=True)
+            image_label.bind("<Button-1>", click_callback)
+        else:
+            raise Exception("No Image")
+    except Exception:
+        image_label = Label(image_frame, text="📷\nNo Image Available", bg="#f5f5f5", fg="#b0b0b0", font=("Helvetica", 12), justify="center")
+        image_label.pack(expand=True)
+        image_label.bind("<Button-1>", click_callback)
+
+    title_label = Label(card, text=product.title, font=("Helvetica", 14, "bold"), bg="white", fg="#002f34", wraplength=300, justify="left")
+    title_label.pack(anchor="w", padx=15, pady=(10, 5))
+    title_label.bind("<Button-1>", click_callback)
+    
+    Label(card, text=f"Rs. {product.price}", font=("Helvetica", 13, "bold"), bg="white", fg="#002f34").pack(anchor="w", padx=15, pady=(5,0))
+    Label(card, text=f"📂 Category: {product.category}", font=("Helvetica",10,"bold"), bg="white", fg="#3a77ff").pack(pady=3)
+    Label(card, text=f"👤Seller: {product.seller}", font=("Helvetica", 10, "italic"), bg="white", fg="#7f8c8d").pack(anchor="w", padx=15, pady=5)
+    
+    if product.status == "sold":
+        Label(card, text="SOLD OUT", bg="gray", fg="white", font=("Helvetica",12,"bold"), width=15).pack(pady=10)
+
+    return card
 
 
 def open_add_product(window, user):
@@ -28,11 +69,19 @@ def open_add_product(window, user):
     price_entry.pack(ipady=8,pady=(5,20))
 
     Label(add_window,text="Category",font=("Helvetica",12,"bold"),bg="#dff6f0").pack(pady=(0,5))
-    category_var=StringVar()
-    category_var.set("Electronics")
-    category_menu=OptionMenu(add_window,category_var,"Electronics","Fashion","Furniture","Automobiles","Books","other")
-    category_menu.config(width=20,font=("helvetica",11))
-    category_menu.pack(pady=(5,20))
+    
+    category_names = [node.name for node in category_tree.children]
+    
+    category_var = StringVar()
+    if category_names:
+        category_var.set(category_names[0]) # Default pehli category set karein
+    else:
+        category_var.set("Other")
+
+    
+    category_menu = OptionMenu(add_window, category_var, *category_names)
+    category_menu.config(width=20, font=("helvetica", 11))
+    category_menu.pack(pady=(5, 20))
 
     subcategory_var = StringVar()
     Label(add_window, text="Sub-Category", font=("Helvetica", 12, "bold"), bg="#dff6f0").pack(pady=(0, 5))
@@ -269,9 +318,9 @@ def open_products_window(window, previous_window):
     sidebar.pack(side=LEFT, fill="y")
     sidebar.pack_propagate(False)
     Label(sidebar, text="FEATURES", bg="#002f34", fg="#7f8c8d", font=("Helvetica", 10, "bold")).pack(pady=(20, 10))
-    recent_btn = Button(sidebar, text="🕑 Recently Viewed", bg="#245de6", fg="white", font=("Helvetica", 10, "bold"), relief="flat", cursor="hand2", padx=10, pady=10, command=lambda: open_recently_viewed())
+    recent_btn = Button(sidebar, text="🕑 Recently Viewed", bg="#00a49f", fg="white", font=("Helvetica", 10, "bold"), relief="flat", cursor="hand2", padx=10, pady=10, command=lambda: open_recently_viewed())
     recent_btn.pack(fill="x", padx=15, pady=5)
-    undo_btn = Button(sidebar, text="↩ Undo Delete", bg="#245de6", fg="white", font=("Helvetica", 10, "bold"), relief="flat", cursor="hand2", padx=10, pady=10, command=lambda: undo_last_delete())
+    undo_btn = Button(sidebar, text="↩ Undo Delete", bg="#00a49f", fg="white", font=("Helvetica", 10, "bold"), relief="flat", cursor="hand2", padx=10, pady=10, command=lambda: undo_last_delete())
     undo_btn.pack(fill="x", padx=15, pady=5)
     content_area = Frame(main_content, bg="#dff6f0")
     content_area.pack(side=LEFT, fill="both", expand=True)
@@ -289,6 +338,7 @@ def open_products_window(window, previous_window):
     def filter_subcategory(subcategory) :
         nonlocal selected_subcategory
         selected_subcategory=subcategory
+        current_page = 0
         load_products(search_entry.get())
 
     def show_subcategory_buttons(category_name) :
@@ -297,14 +347,15 @@ def open_products_window(window, previous_window):
         subs=get_subcategories(category_name)
         if not subs :
             return
-        Button(subcategory_frame, text="ALL", bg="#3a77ff", fg="white", font=("Helvetica", 9, "bold"), relief="flat", cursor="hand2", padx=10, pady=4, command=lambda: filter_subcategory("ALL")).pack(side="left", padx=3)
+        Button(subcategory_frame, text="ALL", bg="#00a49f", fg="white", font=("Helvetica", 9, "bold"), relief="flat", cursor="hand2", padx=10, pady=4, command=lambda: filter_subcategory("ALL")).pack(side="left", padx=3)
         for sub in subs :
-            Button(subcategory_frame, text=sub, bg="#3a77ff", fg="white", font=("Helvetica", 9, "bold"), relief="flat", cursor="hand2", padx=10, pady=4, command=lambda s=sub: filter_subcategory(s)).pack(side="left", padx=3)
+            Button(subcategory_frame, text=sub, bg="#00a49f", fg="white", font=("Helvetica", 9, "bold"), relief="flat", cursor="hand2", padx=10, pady=4, command=lambda s=sub: filter_subcategory(s)).pack(side="left", padx=3)
 
     def filter_category(category):
         nonlocal selected_category, selected_subcategory
         selected_category = category
         selected_subcategory = "ALL"
+        current_page = 0
         show_subcategory_buttons(category)
         load_products(search_entry.get())
 
@@ -315,7 +366,7 @@ def open_products_window(window, previous_window):
     search_entry = Entry(search_frame,width=40,font=("Helvetica", 13),relief="solid",bd=1)
     search_entry.pack(side=LEFT,ipady=8,padx=10)
 
-    search_btn = Button(search_frame,text="🔍 Search",bg="#2f6df6",fg="white",activebackground="#2457c5",activeforeground="white",font=("Helvetica", 12, "bold"),cursor="hand2",relief="flat",bd=0,padx=20,pady=8)
+    search_btn = Button(search_frame,text="🔍 Search",bg="#00a49f",fg="white",activebackground="#002f34",activeforeground="white",font=("Helvetica", 12, "bold"),cursor="hand2",relief="flat",bd=0,padx=20,pady=8)
     search_btn.pack(side=LEFT)
 
     grid_container = Frame(content_area, bg="#dff6f0")
@@ -366,6 +417,11 @@ def open_products_window(window, previous_window):
         products = get_products()
         if selected_category != "ALL":
             products = [p for p in products if p.category.lower() == selected_category.lower()]
+            
+        
+        if selected_subcategory != "ALL":
+            products = [p for p in products if hasattr(p, 'subcategory') and p.subcategory.lower() == selected_subcategory.lower()]
+            
         if search_text :
             products = [p for p in products if search_text.lower() in p.title.lower()]
         total_pages = max(1, (len(products) + PAGE_SIZE - 1) // PAGE_SIZE)
@@ -374,55 +430,17 @@ def open_products_window(window, previous_window):
         products = products[start:start + PAGE_SIZE]
 
         for product in products:
-            title = product.title
-            price = product.price
-            image_path = product.image
-            status  = product.status
-            category=product.category
-            seller = product.seller
-
-            card = Frame(scrollable_frame,bg="white",width=300,height=380,highlightthickness=1,highlightbackground="#e0e0e0",bd=0,relief="flat",cursor="hand2")
-            card.grid(row=0,column=0,padx=15,pady=15,)
-            card.grid_propagate(False)
-            current_cards.append(card)
-
+            # Click event function
             def open_this_detail(e, p=product):
                 if state.current_user:
                     state.track_view(p, state.current_user)
                 open_product_detail(window, p, on_change=lambda: load_products(search_entry.get()))
 
-            card.bind("<Button-1>", open_this_detail)
-
-            image_frame = Frame(card,bg="#f8f8f8",width=280,height=200)
-            image_frame.pack(pady=15)
-            image_frame.pack_propagate(False)
-            image_frame.bind("<Button-1>", open_this_detail)
-
-            try:
-                if image_path:
-                    img = Image.open(image_path)
-                    img = img.resize((280, 200),Image.LANCZOS)
-                    img = ImageTk.PhotoImage(img)
-                    image_label = Label(image_frame,image=img,bg="#f5f5f5")
-                    image_label.image = img
-                    image_label.pack(fill="both",expand=True)
-                    image_label.bind("<Button-1>", open_this_detail)
-                else:
-                    raise Exception("No Image")
-            except Exception:
-                image_label = Label(image_frame, text="📷\nNo Image Available", bg="#f5f5f5", fg="#b0b0b0", font=("Helvetica", 12), justify="center")
-                image_label.pack(expand=True)
-                image_label.bind("<Button-1>", open_this_detail)
-
-            title_label = Label(card,text=title,font=("Helvetica", 14, "bold"),bg="white",fg="#002f34",wraplength=300,justify="left")
-            title_label.pack(anchor="w",padx=15,pady=(10, 5))
-            title_label.bind("<Button-1>", open_this_detail)
-            Label(card,text=f"Rs. {price}",font=("Helvetica", 13, "bold"),bg="white",fg="#002f34").pack(anchor="w",padx=15,pady=(5,0))
-            Label(card,text=f"📂 Category: {category}",font=("Helvetica",10,"bold"),bg="white",fg="#3a77ff").pack(pady=3)
-            Label(card,text=f"👤Seller: {seller}",font=("Helvetica", 10, "italic"),bg="white",fg="#7f8c8d").pack(anchor="w",padx=15,pady=5)
-            if status == "sold":
-                Label(card,text="SOLD OUT",bg="gray",fg="white",font=("Helvetica",12,"bold"),width=15).pack(pady=10)
-
+            # UI draw karne ke liye helper function call karein
+            card = create_product_card(scrollable_frame, product, open_this_detail)
+            card.grid(row=0, column=0, padx=15, pady=15)
+            
+            current_cards.append(card)
         reflow_cards()
 
     def open_recently_viewed() :
@@ -459,6 +477,7 @@ def open_products_window(window, previous_window):
 
     def search_products():
         text = search_entry.get()
+        current_page = 0
         load_products(text)
 
     search_btn.config(command=search_products)

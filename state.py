@@ -1,3 +1,4 @@
+import os
 from collections import deque
 from product import restore_products
 
@@ -8,14 +9,17 @@ deleted_products = {}
 
 def get_saved_user_email():
     try:
-        with open("database/saved_user.txt", "r") as file:
+        file_path = os.path.join(os.path.dirname(__file__), "database", "saved_user.txt")
+        with open(file_path, "r") as file:
             return file.read().strip()
+            
     except FileNotFoundError:
         return ""
 
 
 def save_user_email(email):
-    with open("database/saved_user.txt", "w") as file:
+    file_path = os.path.join(os.path.dirname(__file__), "database", "saved_user.txt")
+    with open(file_path, "w") as file:
         file.write(email)
 
 

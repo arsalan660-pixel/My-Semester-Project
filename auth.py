@@ -1,8 +1,10 @@
 import sqlite3
 import bcrypt
+import os
 
 def connect():
-    conn = sqlite3.connect("database/olx.db")
+    db_path = os.path.join(os.path.dirname(__file__), "database", "olx.db")
+    conn = sqlite3.connect(db_path)
     return conn
 
 

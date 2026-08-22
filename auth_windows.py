@@ -2,29 +2,33 @@ from tkinter import *
 from tkinter import messagebox
 import state
 from auth import register_user, login_user, delete_user
+from utils import create_toplevel_window
 
 
 def open_register(window):
+    register_window = create_toplevel_window(window, "Register", "420x550")
 
-    register_window = Toplevel(window)
-    register_window.title("Register")
-    register_window.geometry("400x480")
-    register_window.configure(bg="#dff6f0")
+    heading = Label(register_window, text="Create Your Account", font=("Helvetica", 20, "bold"), bg="#dff6f0", fg="#002f34")
+    heading.pack(pady=(30, 20))
 
-    heading = Label(register_window,text="Create Your Account",font=("Helvetica", 20, "bold"),bg="#dff6f0",fg="#002f34")
-    heading.pack(pady=(20,25))
+    # White Card Wrapper
+    card = Frame(register_window, bg="white", highlightthickness=1, highlightbackground="#e0e0e0", bd=0)
+    card.pack(padx=30, pady=(0, 20), fill="both", expand=True)
 
-    Label(register_window,text="Name",font=("Helvetica", 12, "bold"),bg="#dff6f0").pack(pady=(0,5))
-    name_entry = Entry(register_window, width=30)
-    name_entry.pack(ipady=8,pady=(5,25))
+    inner = Frame(card, bg="white")
+    inner.pack(padx=25, pady=25, fill="both", expand=True)
 
-    Label(register_window,text="Email",font=("Helvetica", 12, "bold"),bg="#dff6f0").pack(pady=(0,5))
-    email_entry = Entry(register_window, width=30)
-    email_entry.pack(ipady=8,pady=(5,25))
+    Label(inner, text="Name", font=("Helvetica", 11, "bold"), bg="white", fg="#002f34").pack(anchor="w")
+    name_entry = Entry(inner, width=28, font=("Helvetica", 11), relief="solid", bd=1)
+    name_entry.pack(ipady=6, pady=(4, 16), fill="x")
 
-    Label(register_window,text="Password",font=("Helvetica", 12, "bold"),bg="#dff6f0").pack(pady=(0,5))
-    password_entry = Entry(register_window,width=30,show="*")
-    password_entry.pack(ipady=8,pady=(5,20))
+    Label(inner, text="Email", font=("Helvetica", 11, "bold"), bg="white", fg="#002f34").pack(anchor="w")
+    email_entry = Entry(inner, width=28, font=("Helvetica", 11), relief="solid", bd=1)
+    email_entry.pack(ipady=6, pady=(4, 16), fill="x")
+
+    Label(inner, text="Password", font=("Helvetica", 11, "bold"), bg="white", fg="#002f34").pack(anchor="w")
+    password_entry = Entry(inner, width=28, font=("Helvetica", 11), show="*", relief="solid", bd=1)
+    password_entry.pack(ipady=6, pady=(4, 25), fill="x")
 
     def save_user():
         name = name_entry.get()
@@ -32,28 +36,27 @@ def open_register(window):
         password = password_entry.get()
 
         if name == "" or email == "" or password == "":
-            messagebox.showerror("Error","Please fill all fields")
+            messagebox.showerror("Error", "Please fill all fields")
             return
 
-        result=register_user(name, email, password)
+        result = register_user(name, email, password)
 
-        if result :
-            messagebox.showinfo("Success","Succesfully registered !!")
+        if result:
+            messagebox.showinfo("Success", "Succesfully registered !!")
             register_window.destroy()
-        else :
-            messagebox.showerror("Error","Email already exists !! ")
+        else:
+            messagebox.showerror("Error", "Email already exists !! ")
 
-    register_btn = Label(register_window,text="Register",bg="#00a49f",fg="white",font=("Helvetica", 13, "bold"),width=20,height=2,cursor="hand2")
-    register_btn.pack(pady=(30,10))
-    register_btn.bind("<Button-1>", lambda e: save_user())
-
+    # Modern Button (Teal Theme)
+    register_btn = Button(inner, text="Register", bg="#00a49f", fg="white",
+                          activebackground="#002f34", activeforeground="white",
+                          font=("Helvetica", 12, "bold"), relief="flat", bd=0,
+                          cursor="hand2", pady=10, command=save_user)
+    register_btn.pack(fill="x")
 
 def open_login(window):
+    login_window = create_toplevel_window(window, "Login", "420x460")
 
-    login_window = Toplevel(window)
-    login_window.title("Login")
-    login_window.geometry("420x460")
-    login_window.configure(bg="#dff6f0")
 
     heading = Label(login_window, text="OLX Clone", font=("Helvetica", 20, "bold"),
                      bg="#dff6f0", fg="#002f34")
@@ -100,10 +103,7 @@ def open_login(window):
         else:
             messagebox.showerror("Error", "Invalid Email or Password")
 
-    login_btn = Button(inner, text="Login", bg="#3a77ff", fg="white",
-                        activebackground="#245de6", activeforeground="white",
-                        font=("Helvetica", 12, "bold"), relief="flat", bd=0,
-                        cursor="hand2", pady=10, command=login_user_gui)
+    login_btn = Button(inner, text="Login", bg="#00a49f", fg="white",activebackground="#002f34", activeforeground="white",font=("Helvetica", 12, "bold"), relief="flat", bd=0,cursor="hand2", pady=10, command=login_user_gui)
     login_btn.pack(fill="x")
 
     create_account_label = Label(login_window, text="Don't have an account? Register",
@@ -114,22 +114,25 @@ def open_login(window):
 
 
 def open_delete_account(window):
+    delete_window = create_toplevel_window(window, "Delete Account", "420x460")
 
-    delete_window = Toplevel(window)
-    delete_window.title("Delete Account")
-    delete_window.geometry("400x350")
-    delete_window.configure(bg="#dff6f0")
+    heading = Label(delete_window, text="Delete Your Account", font=("Helvetica", 20, "bold"), bg="#dff6f0", fg="#ff4d4d")
+    heading.pack(pady=(30, 20))
 
-    heading = Label(delete_window,text="Delete Your Account",font=("Helvetica", 20, "bold"),bg="#dff6f0",fg="red")
-    heading.pack(pady=(20,25))
+    # White Card Wrapper
+    card = Frame(delete_window, bg="white", highlightthickness=1, highlightbackground="#e0e0e0", bd=0)
+    card.pack(padx=30, pady=(0, 20), fill="both", expand=True)
 
-    Label(delete_window,text="Email",font=("Helvetica", 12, "bold"),bg="#dff6f0").pack(pady=(0,5))
-    email_entry = Entry(delete_window, width=30)
-    email_entry.pack(ipady=8,pady=(5,20))
+    inner = Frame(card, bg="white")
+    inner.pack(padx=25, pady=25, fill="both", expand=True)
 
-    Label(delete_window,text="Password",font=("Helvetica", 12, "bold"),bg="#dff6f0").pack(pady=(0,5))
-    password_entry = Entry(delete_window,width=30,show="*")
-    password_entry.pack(ipady=8,pady=(5,20))
+    Label(inner, text="Email", font=("Helvetica", 11, "bold"), bg="white", fg="#002f34").pack(anchor="w")
+    email_entry = Entry(inner, width=28, font=("Helvetica", 11), relief="solid", bd=1)
+    email_entry.pack(ipady=6, pady=(4, 16), fill="x")
+
+    Label(inner, text="Password", font=("Helvetica", 11, "bold"), bg="white", fg="#002f34").pack(anchor="w")
+    password_entry = Entry(inner, width=28, font=("Helvetica", 11), show="*", relief="solid", bd=1)
+    password_entry.pack(ipady=6, pady=(4, 25), fill="x")
 
     def delete_account():
         email = email_entry.get()
@@ -138,11 +141,14 @@ def open_delete_account(window):
         deleted = delete_user(email, password)
 
         if deleted:
-            messagebox.showinfo("Success","Account Deleted Successfully")
+            messagebox.showinfo("Success", "Account Deleted Successfully")
             delete_window.destroy()
         else:
-            messagebox.showerror("Error","Invalid Email or Password")
+            messagebox.showerror("Error", "Invalid Email or Password")
 
-    delete_btn = Label(delete_window,text="Delete Account",bg="#ff4d4d",fg="white",font=("Helvetica", 13, "bold"),width=20,height=2,cursor="hand2")
-    delete_btn.pack(pady=(30,10))
-    delete_btn.bind("<Button-1>", lambda e: delete_account())
+    # Modern Button (Red for delete action)
+    delete_btn = Button(inner, text="Delete Account", bg="#ff4d4d", fg="white",
+                        activebackground="#cc0000", activeforeground="white",
+                        font=("Helvetica", 12, "bold"), relief="flat", bd=0,
+                        cursor="hand2", pady=10, command=delete_account)
+    delete_btn.pack(fill="x")
