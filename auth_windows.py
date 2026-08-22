@@ -52,26 +52,35 @@ def open_login(window):
 
     login_window = Toplevel(window)
     login_window.title("Login")
-    login_window.geometry("400x400")
+    login_window.geometry("420x460")
     login_window.configure(bg="#dff6f0")
 
-    heading = Label(login_window,text="Login To Your Account",font=("Helvetica", 20, "bold"),bg="#dff6f0",fg="#002f34")
-    heading.pack(pady=(20,25))
+    heading = Label(login_window, text="OLX Clone", font=("Helvetica", 20, "bold"),
+                     bg="#dff6f0", fg="#002f34")
+    heading.pack(pady=(30, 20))
 
-    Label(login_window,text="Email",font=("Helvetica", 12, "bold"),bg="#dff6f0").pack(pady=(0,5))
-    saved_email=state.get_saved_user_email()
-    email_entry=Entry(login_window,width=30)
-    email_entry.pack(ipady=8,pady=(5,20))
-    if saved_email :
-        email_entry.insert(0,saved_email)
+    card = Frame(login_window, bg="white", highlightthickness=1,
+                 highlightbackground="#e0e0e0", bd=0)
+    card.pack(padx=30, pady=(0, 20), fill="x")
 
-    Label(login_window,text="Password",font=("Helvetica", 12, "bold"),bg="#dff6f0").pack(pady=(0,5))
-    password_entry = Entry(login_window,width=30,show="*")
-    password_entry.pack(ipady=8,pady=(5,20))
+    inner = Frame(card, bg="white")
+    inner.pack(padx=25, pady=25, fill="x")
 
-    remember_var=BooleanVar(value=bool(saved_email))
-    remember_check=Checkbutton(login_window,text="Remember Me",variable=remember_var,bg="#dff6f0",font=("Helvetica", 10))
-    remember_check.pack(pady=(0,15))
+    Label(inner, text="Email", font=("Helvetica", 11, "bold"), bg="white", fg="#002f34").pack(anchor="w")
+    saved_email = state.get_saved_user_email()
+    email_entry = Entry(inner, width=28, font=("Helvetica", 11), relief="solid", bd=1)
+    email_entry.pack(ipady=6, pady=(4, 16), fill="x")
+    if saved_email:
+        email_entry.insert(0, saved_email)
+
+    Label(inner, text="Password", font=("Helvetica", 11, "bold"), bg="white", fg="#002f34").pack(anchor="w")
+    password_entry = Entry(inner, width=28, font=("Helvetica", 11), show="*", relief="solid", bd=1)
+    password_entry.pack(ipady=6, pady=(4, 12), fill="x")
+
+    remember_var = BooleanVar(value=bool(saved_email))
+    remember_check = Checkbutton(inner, text="Remember Me", variable=remember_var,
+                                  bg="white", font=("Helvetica", 9))
+    remember_check.pack(anchor="w", pady=(0, 18))
 
     def login_user_gui():
         email = email_entry.get()
@@ -81,19 +90,27 @@ def open_login(window):
 
         if user:
             state.current_user = user
-            if remember_var.get() :
+            if remember_var.get():
                 state.save_user_email(email)
-            else :
+            else:
                 state.save_user_email("")
             login_window.destroy()
             from dashboard_window import open_dashboard
             open_dashboard(window, user)
         else:
-            messagebox.showerror("Error","Invalid Email or Password")
+            messagebox.showerror("Error", "Invalid Email or Password")
 
-    login_btn = Label(login_window,text="Login",bg="#3a77ff",fg="white",font=("Helvetica", 13, "bold"),width=20,height=2,cursor="hand2")
-    login_btn.pack(pady=(30,10))
-    login_btn.bind("<Button-1>", lambda e: login_user_gui())
+    login_btn = Button(inner, text="Login", bg="#3a77ff", fg="white",
+                        activebackground="#245de6", activeforeground="white",
+                        font=("Helvetica", 12, "bold"), relief="flat", bd=0,
+                        cursor="hand2", pady=10, command=login_user_gui)
+    login_btn.pack(fill="x")
+
+    create_account_label = Label(login_window, text="Don't have an account? Register",
+                                  bg="#dff6f0", fg="#6b7280", font=("Helvetica", 9, "underline"),
+                                  cursor="hand2")
+    create_account_label.pack(pady=(5, 0))
+    create_account_label.bind("<Button-1>", lambda e: (login_window.destroy(), open_register(window)))
 
 
 def open_delete_account(window):
