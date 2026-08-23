@@ -14,6 +14,7 @@ A sleek, desktop based marketplace application developed using **Python**, **Tki
 * Dedicated "My Listings" view in a modern card-layout
 * Delete and **Undo Delete** functionality
 * Automatic "SOLD OUT" status updates
+* Admin Panel And Product Management
 
 **🔍 Discovery & Browsing**
 * Dynamic Category and **Subcategory** filtering

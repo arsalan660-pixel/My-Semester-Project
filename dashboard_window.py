@@ -12,10 +12,7 @@ def on_leave_hover(e):
 
 
 def make_action_button(parent, text, base_color, hover_color, command):
-    btn = Button(parent, text=text, bg=base_color, fg="white",
-                 activebackground=hover_color, activeforeground="white",
-                 font=("Helvetica", 12, "bold"), relief="flat", bd=0,
-                 cursor="hand2", anchor="w", padx=18, pady=12, command=command)
+    btn = Button(parent, text=text, bg=base_color, fg="white",activebackground=hover_color, activeforeground="white",font=("Helvetica", 12, "bold"), relief="flat", bd=0,cursor="hand2", anchor="w", padx=18, pady=12, command=command)
     btn.base_color = base_color
     btn.hover_color = hover_color
     btn.bind("<Enter>", on_enter_hover)
@@ -37,16 +34,13 @@ def open_dashboard(window, user):
     header.pack(fill="x", padx=25, pady=(25, 15))
 
     initials = "".join([w[0].upper() for w in user_name.split()][:2]) or "U"
-    avatar = Label(header, text=initials, bg="#002f34", fg="white",
-                    font=("Helvetica", 16, "bold"), width=3, height=1)
+    avatar = Label(header, text=initials, bg="#002f34", fg="white",font=("Helvetica", 16, "bold"), width=3, height=1)
     avatar.pack(side=LEFT, padx=(0, 12))
 
     name_block = Frame(header, bg="#dff6f0")
     name_block.pack(side=LEFT)
-    Label(name_block, text=user_name, font=("Helvetica", 16, "bold"),
-          bg="#dff6f0", fg="#002f34").pack(anchor="w")
-    Label(name_block, text=user_email, font=("Helvetica", 10),
-          bg="#dff6f0", fg="gray").pack(anchor="w")
+    Label(name_block, text=user_name, font=("Helvetica", 16, "bold"),bg="#dff6f0", fg="#002f34").pack(anchor="w")
+    Label(name_block, text=user_email, font=("Helvetica", 10),bg="#dff6f0", fg="gray").pack(anchor="w")
 
     # Stats as metric cards instead of a plain text row
     all_products = get_products()
@@ -66,12 +60,9 @@ def open_dashboard(window, user):
     stats_frame.pack(fill="x", padx=25, pady=(0, 20))
 
     def metric_card(parent, label, value, value_color):
-        card = Frame(parent, bg="white", highlightthickness=1,
-                     highlightbackground="#e0e0e0")
-        Label(card, text=str(value), font=("Helvetica", 15, "bold"),
-              bg="white", fg=value_color).pack(pady=(10, 0))
-        Label(card, text=label, font=("Helvetica", 9),
-              bg="white", fg="#7f8c8d").pack(pady=(0, 10))
+        card = Frame(parent, bg="white", highlightthickness=1, highlightbackground="#e0e0e0")
+        Label(card, text=str(value), font=("Helvetica", 15, "bold"),bg="white", fg=value_color).pack(pady=(10, 0))
+        Label(card, text=label, font=("Helvetica", 9), bg="white", fg="#7f8c8d").pack(pady=(0, 10))
         return card
 
     metric_card(stats_frame, "Active", active_count, "#00a49f").pack(side=LEFT, fill="both", expand=True, padx=(0, 6))
@@ -82,28 +73,24 @@ def open_dashboard(window, user):
     actions_frame = Frame(dashboard, bg="#dff6f0")
     actions_frame.pack(fill="x", padx=25, pady=(5, 0))
 
-    make_action_button(actions_frame, "\U0001F4CB  My Listings", "#8b5cf6", "#7c4fe0",
-                        lambda: open_my_listings(window, user)).pack(fill="x", pady=(0, 8))
+    make_action_button(actions_frame, "\U0001F4CB  My Listings", "#8b5cf6", "#7c4fe0",lambda: open_my_listings(window, user)).pack(fill="x", pady=(0, 8))
 
     def go_to_sell():
         from product_windows import open_add_product
         open_add_product(window, user)
 
-    make_action_button(actions_frame, "\U0001F4B0  Sell Product", "#00a49f", "#008b87",
-                        go_to_sell).pack(fill="x", pady=(0, 8))
+    make_action_button(actions_frame, "\U0001F4B0  Sell Product", "#00a49f", "#008b87",go_to_sell).pack(fill="x", pady=(0, 8))
 
     def go_to_products():
         dashboard.withdraw()
         from product_windows import open_products_window
         open_products_window(window, dashboard)
 
-    make_action_button(actions_frame, "\U0001F4E6  View Products", "#3a77ff", "#245de6",
-                        go_to_products).pack(fill="x", pady=(0, 8))
+    make_action_button(actions_frame, "\U0001F4E6  View Products", "#3a77ff", "#245de6",go_to_products).pack(fill="x", pady=(0, 8))
 
     Frame(dashboard, bg="#dff6f0", height=15).pack()
 
-    make_action_button(actions_frame, "\U0001F6AA  Logout", "#ff4d4d", "#e63939",
-                        dashboard.destroy).pack(fill="x", pady=(10, 0))
+    make_action_button(actions_frame, "\U0001F6AA  Logout", "#ff4d4d", "#e63939",dashboard.destroy).pack(fill="x", pady=(10, 0))
 
 
 def open_my_listings(window, user):

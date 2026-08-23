@@ -221,13 +221,21 @@ def open_product_detail(window, product, on_change=None):
             messagebox.showinfo("Purchase", f"You bought {product.title}")
             finish()
 
+    # Admin check logic
+    is_admin = False
+    if state.current_user and len(state.current_user) > 4 and state.current_user[4] == 'admin':
+        is_admin = True
+
     def delete_this_product():
         if not state.current_user:
             messagebox.showerror("Stopped !! ", "Please Login First")
             return
-        if product.seller != state.current_user[1]:
+            
+        # Agar na toh owner hai aur na hi admin hai, tab rokna hai
+        if product.seller != state.current_user[1] and not is_admin:
             messagebox.showerror("Not Deleted", "You can only delete Your Own Product")
             return
+            
         confirm = messagebox.askyesno("Delete Product", "Are you sure you want to delete this product?")
         if confirm:
             delete_product(product.id)
@@ -243,26 +251,22 @@ def open_product_detail(window, product, on_change=None):
     if product.status == "sold":
         buy_btn.config(text="SOLD", state=DISABLED, bg="gray")
 
-    is_owner = state.current_user is not None and product.seller == state.current_user[1]
-    if is_owner:
-        delete_btn = Button(action_frame, text="🗑 Delete", bg="#ff4d4f", fg="white",
-                             activebackground="#e63946", activeforeground="white",
-                             font=("Helvetica", 12, "bold"), cursor="hand2", width=15,
-                             relief="flat", bd=0, command=delete_this_product)
+    # Agar user owner hai YA admin hai, toh Delete button dikhao
+    can_delete = (state.current_user is not None and product.seller == state.current_user[1]) or is_admin
+    
+    if can_delete:
+        delete_btn = Button(action_frame, text="🗑 Delete", bg="#ff4d4f", fg="white",activebackground="#e63946", activeforeground="white",font=("Helvetica", 12, "bold"), cursor="hand2", width=15, relief="flat", bd=0, command=delete_this_product)
         delete_btn.pack(side="left")
 
     if state.current_user:
         email = state.current_user[2]
         viewed = [p for p in state.recently_viewed.get(email, []) if p.id != product.id]
         if viewed:
-            Label(detail_window, text="Recently viewed", font=("Helvetica", 11, "bold"),
-                  bg="#dff6f0", fg="#002f34").pack(anchor="w", padx=20, pady=(5, 5))
+            Label(detail_window, text="Recently viewed", font=("Helvetica", 11, "bold"), bg="#dff6f0", fg="#002f34").pack(anchor="w", padx=20, pady=(5, 5))
             rv_row = Frame(detail_window, bg="#dff6f0")
             rv_row.pack(anchor="w", padx=20)
             for p in list(reversed(viewed))[:5]:
-                Label(rv_row, text=p.title, font=("Helvetica", 9), bg="white",
-                      fg="#002f34", width=14, height=3, relief="solid", bd=1,
-                      wraplength=90, justify="center").pack(side="left", padx=4)
+                Label(rv_row, text=p.title, font=("Helvetica", 9), bg="white",fg="#002f34", width=14, height=3, relief="solid", bd=1,wraplength=90, justify="center").pack(side="left", padx=4)
 
 
 def open_products_window(window, previous_window):

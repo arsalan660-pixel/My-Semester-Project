@@ -3,6 +3,7 @@ from tkinter import messagebox
 import state
 from auth import register_user, login_user, delete_user
 from utils import create_toplevel_window
+from admin_window import open_admin_panel
 
 
 def open_register(window):
@@ -48,10 +49,7 @@ def open_register(window):
             messagebox.showerror("Error", "Email already exists !! ")
 
     # Modern Button (Teal Theme)
-    register_btn = Button(inner, text="Register", bg="#00a49f", fg="white",
-                          activebackground="#002f34", activeforeground="white",
-                          font=("Helvetica", 12, "bold"), relief="flat", bd=0,
-                          cursor="hand2", pady=10, command=save_user)
+    register_btn = Button(inner, text="Register", bg="#00a49f", fg="white",activebackground="#002f34", activeforeground="white",font=("Helvetica", 12, "bold"), relief="flat", bd=0,cursor="hand2", pady=10, command=save_user)
     register_btn.pack(fill="x")
 
 def open_login(window):
@@ -97,18 +95,27 @@ def open_login(window):
                 state.save_user_email(email)
             else:
                 state.save_user_email("")
+            
             login_window.destroy()
-            from dashboard_window import open_dashboard
-            open_dashboard(window, user)
+            
+            # Check User Role (Index 4 par hamara naya 'role' column hai)
+            # Default database schema: (id, name, email, password, role)
+            role = user[4] if len(user) > 4 else "user"
+            
+            if role == "admin":
+                # Agar admin hai toh Admin Panel kholo
+                open_admin_panel(window)
+            else:
+                # Agar user hai toh normal Dashboard kholo
+                from dashboard_window import open_dashboard
+                open_dashboard(window, user)
         else:
             messagebox.showerror("Error", "Invalid Email or Password")
 
     login_btn = Button(inner, text="Login", bg="#00a49f", fg="white",activebackground="#002f34", activeforeground="white",font=("Helvetica", 12, "bold"), relief="flat", bd=0,cursor="hand2", pady=10, command=login_user_gui)
     login_btn.pack(fill="x")
 
-    create_account_label = Label(login_window, text="Don't have an account? Register",
-                                  bg="#dff6f0", fg="#6b7280", font=("Helvetica", 9, "underline"),
-                                  cursor="hand2")
+    create_account_label = Label(login_window, text="Don't have an account? Register",bg="#dff6f0", fg="#6b7280", font=("Helvetica", 9, "underline"),cursor="hand2")
     create_account_label.pack(pady=(5, 0))
     create_account_label.bind("<Button-1>", lambda e: (login_window.destroy(), open_register(window)))
 
@@ -147,8 +154,5 @@ def open_delete_account(window):
             messagebox.showerror("Error", "Invalid Email or Password")
 
     # Modern Button (Red for delete action)
-    delete_btn = Button(inner, text="Delete Account", bg="#ff4d4d", fg="white",
-                        activebackground="#cc0000", activeforeground="white",
-                        font=("Helvetica", 12, "bold"), relief="flat", bd=0,
-                        cursor="hand2", pady=10, command=delete_account)
+    delete_btn = Button(inner, text="Delete Account", bg="#ff4d4d", fg="white",activebackground="#cc0000", activeforeground="white",font=("Helvetica", 12, "bold"), relief="flat", bd=0,cursor="hand2", pady=10, command=delete_account)
     delete_btn.pack(fill="x")
